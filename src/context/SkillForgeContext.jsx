@@ -3,20 +3,20 @@ import { INITIAL_VALUE1, INITIAL_VALUE2, LEARN_MODULES, PRACTICE_QUESTIONS, COMM
 
 const SkillForgeContext = createContext();
 
-// Helper to generate dynamic stats based on handle string & solved cases
-export const generateLeetCodeStatsForHandle = (handleStr = 'kumaran_dev', extraSolvedCount = 0) => {
+// Helper to generate consistent fallback stats based on handle string & solved cases
+export const generateLeetCodeStatsForHandle = (handleStr = 'kumaran_dev', extraSolvedCount = 3) => {
   let hash = 0;
   for (let i = 0; i < handleStr.length; i++) {
     hash = (hash << 5) - hash + handleStr.charCodeAt(i);
     hash |= 0;
   }
   const seed = Math.abs(hash);
-  const easy = (seed % 25) + 35 + extraSolvedCount;
-  const medium = (seed % 20) + 25 + Math.floor(extraSolvedCount * 0.5);
-  const hard = (seed % 10) + 8 + Math.floor(extraSolvedCount * 0.2);
+  const easy = (seed % 20) + 15 + extraSolvedCount;
+  const medium = (seed % 15) + 10;
+  const hard = (seed % 6) + 2;
   const totalSolved = easy + medium + hard;
   const globalRank = `#${((seed % 800) * 150 + 12400).toLocaleString()}`;
-  const acceptanceRate = `${(65 + (seed % 20) + 0.4).toFixed(1)}%`;
+  const acceptanceRate = `${(68 + (seed % 15) + 0.4).toFixed(1)}%`;
 
   return {
     easy,
@@ -31,7 +31,7 @@ export const generateLeetCodeStatsForHandle = (handleStr = 'kumaran_dev', extraS
 export const SkillForgeProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Persistent VALUE 2 state (Ensure fallback for leetCodeSolvedCases)
+  // Persistent VALUE 2 state
   const [value2, setValue2] = useState(() => {
     const saved = localStorage.getItem('skillforge_value2');
     if (saved) {
@@ -49,7 +49,7 @@ export const SkillForgeProvider = ({ children }) => {
   // Google User Auth State & Dynamic LeetCode Profile Stats
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('skillforge_user');
-    const defaultHandle = 'kumaran_dev';
+    const defaultHandle = 'Deepakkumaran_21';
     const initialStats = generateLeetCodeStatsForHandle(defaultHandle, 3);
     
     if (saved) {
@@ -64,8 +64,8 @@ export const SkillForgeProvider = ({ children }) => {
 
     return {
       isLoggedIn: true,
-      name: 'Kumaran',
-      email: 'kumaran.dee@gmail.com',
+      name: 'Deepakkumaran',
+      email: 'deepakkumaran21@gmail.com',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
       batch: 'B.Tech CSE • 2026 Batch',
       leetCodeConnected: true,
@@ -92,17 +92,48 @@ export const SkillForgeProvider = ({ children }) => {
     localStorage.setItem('skillforge_value2', JSON.stringify(value2));
   }, [value2]);
 
-  // Sync LeetCode Profile Handle Action (Updates handle + dynamic stats + Value 2 profile)
-  const syncLeetCodeProfile = (newHandle) => {
-    const handle = newHandle.trim() || 'kumaran_dev';
-    const solvedCount = value2.leetCodeSolvedCases ? value2.leetCodeSolvedCases.length : 3;
-    const newStats = generateLeetCodeStatsForHandle(handle, solvedCount);
+  // Sync LeetCode Profile Handle Action (Tries LeetCode Public API + Fallback)
+  const syncLeetCodeProfile = async (newHandle) => {
+    const handle = newHandle.trim() || 'Deepakkumaran_21';
+    const currentSolvedCount = value2.leetCodeSolvedCases ? value2.leetCodeSolvedCases.length : 3;
+
+    let fetchedStats = null;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+      const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${handle}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === 'success') {
+          fetchedStats = {
+            easy: data.easySolved ?? 18,
+            medium: data.mediumSolved ?? 8,
+            hard: data.hardSolved ?? 2,
+            totalSolved: data.totalSolved ?? 28,
+            globalRank: `#${(data.ranking || 142500).toLocaleString()}`,
+            acceptanceRate: `${(data.acceptanceRate || 72.4).toFixed(1)}%`
+          };
+        }
+      }
+    } catch (err) {
+      console.log('LeetCode API fetch note:', err);
+    }
+
+    if (!fetchedStats) {
+      fetchedStats = generateLeetCodeStatsForHandle(handle, currentSolvedCount);
+    }
 
     setUser(prev => ({
       ...prev,
       leetCodeHandle: handle,
       leetCodeConnected: true,
-      leetCodeStats: newStats
+      leetCodeStats: fetchedStats
     }));
 
     setValue2(prev => {
@@ -125,11 +156,13 @@ export const SkillForgeProvider = ({ children }) => {
       ...prev,
       readinessPercentage: Math.min(99, prev.readinessPercentage + 2)
     }));
+
+    return fetchedStats;
   };
 
   // Auth Functions
   const loginWithGoogle = (account) => {
-    const handle = account.name.toLowerCase().replace(/\s+/g, '_') + '_lc';
+    const handle = account.name.toLowerCase().replace(/\s+/g, '_') + '_21';
     const newStats = generateLeetCodeStatsForHandle(handle, 3);
 
     setUser({
@@ -171,13 +204,28 @@ export const SkillForgeProvider = ({ children }) => {
   const solveLeetCodeCase = (lcCase) => {
     const updatedSolvedList = Array.from(new Set([...(value2.leetCodeSolvedCases || []), lcCase.id]));
 
-    // Recalculate dynamic user stats
-    const updatedStats = generateLeetCodeStatsForHandle(user.leetCodeHandle, updatedSolvedList.length);
+    // Update dynamic stats matching updated solved list
+    setUser(prev => {
+      const currentStats = prev.leetCodeStats || generateLeetCodeStatsForHandle(prev.leetCodeHandle, 3);
+      let newEasy = currentStats.easy;
+      let newMedium = currentStats.medium;
+      let newHard = currentStats.hard;
 
-    setUser(prev => ({
-      ...prev,
-      leetCodeStats: updatedStats
-    }));
+      if (lcCase.difficulty === 'Easy') newEasy += 1;
+      else if (lcCase.difficulty === 'Medium') newMedium += 1;
+      else if (lcCase.difficulty === 'Hard') newHard += 1;
+
+      return {
+        ...prev,
+        leetCodeStats: {
+          ...currentStats,
+          easy: newEasy,
+          medium: newMedium,
+          hard: newHard,
+          totalSolved: newEasy + newMedium + newHard
+        }
+      };
+    });
 
     setValue1(prev => ({
       ...prev,
@@ -310,13 +358,13 @@ export const SkillForgeProvider = ({ children }) => {
     setValue2(INITIAL_VALUE2);
     setUser({
       isLoggedIn: true,
-      name: 'Kumaran',
-      email: 'kumaran.dee@gmail.com',
+      name: 'Deepakkumaran',
+      email: 'deepakkumaran21@gmail.com',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
       batch: 'B.Tech CSE • 2026 Batch',
       leetCodeConnected: true,
-      leetCodeHandle: 'kumaran_dev',
-      leetCodeStats: generateLeetCodeStatsForHandle('kumaran_dev', 3)
+      leetCodeHandle: 'Deepakkumaran_21',
+      leetCodeStats: generateLeetCodeStatsForHandle('Deepakkumaran_21', 3)
     });
   };
 

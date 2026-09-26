@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const LeetCodeModal = ({ isOpen, onClose }) => {
   const { user, value2, leetCodeStudyCases, syncLeetCodeProfile, setActiveTab } = useSkillForge();
-  const [handleInput, setHandleInput] = useState(user.leetCodeHandle || 'kumaran_dev');
+  const [handleInput, setHandleInput] = useState(user.leetCodeHandle || 'Deepakkumaran_21');
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncedSuccess, setSyncedSuccess] = useState(false);
 
@@ -16,15 +16,22 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
   const completedCases = leetCodeStudyCases.filter(lc => solvedSet.includes(lc.id));
   const pendingCases = leetCodeStudyCases.filter(lc => !solvedSet.includes(lc.id));
 
-  const handleSync = () => {
+  // Count difficulty breakdown of completed vs pending cases
+  const completedEasy = completedCases.filter(c => c.difficulty === 'Easy').length;
+  const completedMedium = completedCases.filter(c => c.difficulty === 'Medium').length;
+  const completedHard = completedCases.filter(c => c.difficulty === 'Hard').length;
+
+  const pendingEasy = pendingCases.filter(c => c.difficulty === 'Easy').length;
+  const pendingMedium = pendingCases.filter(c => c.difficulty === 'Medium').length;
+  const pendingHard = pendingCases.filter(c => c.difficulty === 'Hard').length;
+
+  const handleSync = async () => {
     setIsSyncing(true);
     setSyncedSuccess(false);
     
-    setTimeout(() => {
-      syncLeetCodeProfile(handleInput);
-      setIsSyncing(false);
-      setSyncedSuccess(true);
-    }, 600);
+    await syncLeetCodeProfile(handleInput);
+    setIsSyncing(false);
+    setSyncedSuccess(true);
   };
 
   if (!isOpen) return null;
@@ -82,8 +89,8 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
 
             {syncedSuccess && (
               <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-1.5">
-                <Sparkles size={14} className="text-emerald-600" />
-                <span>Synced handle '{handleInput}'! Total Solved: {user.leetCodeStats?.totalSolved || 89}. {completedCases.length} Cases unlocked for AI Placement Tests.</span>
+                <Sparkles size={14} className="text-emerald-600 shrink-0" />
+                <span>Synced handle '{handleInput}'! Total Solved: {user.leetCodeStats?.totalSolved || 28}. {completedCases.length} Cases unlocked for AI Placement Tests.</span>
               </motion.div>
             )}
           </div>
@@ -92,31 +99,40 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
               <span className="text-[10px] font-bold text-emerald-800 uppercase">Easy Solved</span>
-              <h4 className="text-lg font-extrabold text-emerald-700">{user.leetCodeStats?.easy || 45}</h4>
+              <h4 className="text-lg font-extrabold text-emerald-700">{user.leetCodeStats?.easy ?? 18}</h4>
             </div>
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
               <span className="text-[10px] font-bold text-amber-800 uppercase">Medium Solved</span>
-              <h4 className="text-lg font-extrabold text-amber-700">{user.leetCodeStats?.medium || 32}</h4>
+              <h4 className="text-lg font-extrabold text-amber-700">{user.leetCodeStats?.medium ?? 8}</h4>
             </div>
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
               <span className="text-[10px] font-bold text-rose-800 uppercase">Hard Solved</span>
-              <h4 className="text-lg font-extrabold text-rose-700">{user.leetCodeStats?.hard || 12}</h4>
+              <h4 className="text-lg font-extrabold text-rose-700">{user.leetCodeStats?.hard ?? 2}</h4>
             </div>
           </div>
 
           {/* Pipeline Information */}
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-bold text-slate-800 flex items-center gap-1">
-                <CheckCircle2 size={13} className="text-emerald-600" /> Completed Cases (Used in Tests):
-              </span>
-              <span className="font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">{completedCases.length} Cases</span>
+            <div className="flex justify-between items-center p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                <div>
+                  <span className="font-bold text-slate-800">Completed Cases (Used in Tests):</span>
+                  <span className="text-[10px] text-slate-500 block">({completedEasy} Easy, {completedMedium} Medium, {completedHard} Hard)</span>
+                </div>
+              </div>
+              <span className="font-bold text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">{completedCases.length} Cases</span>
             </div>
-            <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-bold text-slate-800 flex items-center gap-1">
-                <AlertTriangle size={13} className="text-amber-600" /> Pending Cases (Help to Learn Queue):
-              </span>
-              <span className="font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">{pendingCases.length} Cases</span>
+
+            <div className="flex justify-between items-center p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle size={14} className="text-amber-600 shrink-0" />
+                <div>
+                  <span className="font-bold text-slate-800">Pending Cases (Help to Learn Queue):</span>
+                  <span className="text-[10px] text-slate-500 block">({pendingEasy} Easy, {pendingMedium} Medium, {pendingHard} Hard)</span>
+                </div>
+              </div>
+              <span className="font-bold text-amber-600 bg-amber-100 px-2.5 py-0.5 rounded-full">{pendingCases.length} Cases</span>
             </div>
           </div>
 
