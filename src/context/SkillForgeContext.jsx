@@ -3,28 +3,33 @@ import { INITIAL_VALUE1, INITIAL_VALUE2, LEARN_MODULES, PRACTICE_QUESTIONS, COMM
 
 const SkillForgeContext = createContext();
 
+// Helper to generate dynamic stats based on handle string & solved cases
+export const generateLeetCodeStatsForHandle = (handleStr = 'kumaran_dev', extraSolvedCount = 0) => {
+  let hash = 0;
+  for (let i = 0; i < handleStr.length; i++) {
+    hash = (hash << 5) - hash + handleStr.charCodeAt(i);
+    hash |= 0;
+  }
+  const seed = Math.abs(hash);
+  const easy = (seed % 25) + 35 + extraSolvedCount;
+  const medium = (seed % 20) + 25 + Math.floor(extraSolvedCount * 0.5);
+  const hard = (seed % 10) + 8 + Math.floor(extraSolvedCount * 0.2);
+  const totalSolved = easy + medium + hard;
+  const globalRank = `#${((seed % 800) * 150 + 12400).toLocaleString()}`;
+  const acceptanceRate = `${(65 + (seed % 20) + 0.4).toFixed(1)}%`;
+
+  return {
+    easy,
+    medium,
+    hard,
+    totalSolved,
+    globalRank,
+    acceptanceRate
+  };
+};
+
 export const SkillForgeProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
-
-  // Google User Auth State
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('skillforge_user');
-    return saved ? JSON.parse(saved) : {
-      isLoggedIn: true,
-      name: 'Kumaran',
-      email: 'kumaran.dee@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-      batch: 'B.Tech CSE • 2026 Batch',
-      leetCodeConnected: true,
-      leetCodeHandle: 'kumaran_dev'
-    };
-  });
-
-  // Persistent VALUE 1 state
-  const [value1, setValue1] = useState(() => {
-    const saved = localStorage.getItem('skillforge_value1');
-    return saved ? JSON.parse(saved) : INITIAL_VALUE1;
-  });
 
   // Persistent VALUE 2 state (Ensure fallback for leetCodeSolvedCases)
   const [value2, setValue2] = useState(() => {
@@ -41,6 +46,40 @@ export const SkillForgeProvider = ({ children }) => {
     return INITIAL_VALUE2;
   });
 
+  // Google User Auth State & Dynamic LeetCode Profile Stats
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('skillforge_user');
+    const defaultHandle = 'kumaran_dev';
+    const initialStats = generateLeetCodeStatsForHandle(defaultHandle, 3);
+    
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const handle = parsed.leetCodeHandle || defaultHandle;
+      return {
+        ...parsed,
+        leetCodeHandle: handle,
+        leetCodeStats: parsed.leetCodeStats || generateLeetCodeStatsForHandle(handle, 3)
+      };
+    }
+
+    return {
+      isLoggedIn: true,
+      name: 'Kumaran',
+      email: 'kumaran.dee@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      batch: 'B.Tech CSE • 2026 Batch',
+      leetCodeConnected: true,
+      leetCodeHandle: defaultHandle,
+      leetCodeStats: initialStats
+    };
+  });
+
+  // Persistent VALUE 1 state
+  const [value1, setValue1] = useState(() => {
+    const saved = localStorage.getItem('skillforge_value1');
+    return saved ? JSON.parse(saved) : INITIAL_VALUE1;
+  });
+
   useEffect(() => {
     localStorage.setItem('skillforge_user', JSON.stringify(user));
   }, [user]);
@@ -53,13 +92,17 @@ export const SkillForgeProvider = ({ children }) => {
     localStorage.setItem('skillforge_value2', JSON.stringify(value2));
   }, [value2]);
 
-  // Sync LeetCode Profile Handle Action
+  // Sync LeetCode Profile Handle Action (Updates handle + dynamic stats + Value 2 profile)
   const syncLeetCodeProfile = (newHandle) => {
     const handle = newHandle.trim() || 'kumaran_dev';
+    const solvedCount = value2.leetCodeSolvedCases ? value2.leetCodeSolvedCases.length : 3;
+    const newStats = generateLeetCodeStatsForHandle(handle, solvedCount);
+
     setUser(prev => ({
       ...prev,
       leetCodeHandle: handle,
-      leetCodeConnected: true
+      leetCodeConnected: true,
+      leetCodeStats: newStats
     }));
 
     setValue2(prev => {
@@ -86,6 +129,9 @@ export const SkillForgeProvider = ({ children }) => {
 
   // Auth Functions
   const loginWithGoogle = (account) => {
+    const handle = account.name.toLowerCase().replace(/\s+/g, '_') + '_lc';
+    const newStats = generateLeetCodeStatsForHandle(handle, 3);
+
     setUser({
       isLoggedIn: true,
       name: account.name,
@@ -93,9 +139,10 @@ export const SkillForgeProvider = ({ children }) => {
       avatar: account.avatar,
       batch: account.batch,
       leetCodeConnected: true,
-      leetCodeHandle: account.name.toLowerCase().replace(/\s+/g, '_') + '_lc'
+      leetCodeHandle: handle,
+      leetCodeStats: newStats
     });
-    syncLeetCodeProfile(account.name.toLowerCase().replace(/\s+/g, '_') + '_lc');
+    syncLeetCodeProfile(handle);
   };
 
   const logout = () => {
@@ -120,8 +167,18 @@ export const SkillForgeProvider = ({ children }) => {
     });
   };
 
-  // Action 2: Solve LeetCode Study Case (Syncs to Value 2 Learned Profile!)
+  // Action 2: Solve LeetCode Study Case (Syncs to Value 2 Learned Profile + Updates Stats!)
   const solveLeetCodeCase = (lcCase) => {
+    const updatedSolvedList = Array.from(new Set([...(value2.leetCodeSolvedCases || []), lcCase.id]));
+
+    // Recalculate dynamic user stats
+    const updatedStats = generateLeetCodeStatsForHandle(user.leetCodeHandle, updatedSolvedList.length);
+
+    setUser(prev => ({
+      ...prev,
+      leetCodeStats: updatedStats
+    }));
+
     setValue1(prev => ({
       ...prev,
       totalPracticeQuestionsSolved: prev.totalPracticeQuestionsSolved + 1,
@@ -129,12 +186,10 @@ export const SkillForgeProvider = ({ children }) => {
     }));
 
     setValue2(prev => {
-      const updatedSolved = Array.from(new Set([...(prev.leetCodeSolvedCases || []), lcCase.id]));
       const updatedTopics = Array.from(new Set([...prev.topicsStudied, lcCase.learnedTopicRef]));
-
       return {
         ...prev,
-        leetCodeSolvedCases: updatedSolved,
+        leetCodeSolvedCases: updatedSolvedList,
         topicsStudied: updatedTopics
       };
     });
@@ -260,7 +315,8 @@ export const SkillForgeProvider = ({ children }) => {
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
       batch: 'B.Tech CSE • 2026 Batch',
       leetCodeConnected: true,
-      leetCodeHandle: 'kumaran_dev'
+      leetCodeHandle: 'kumaran_dev',
+      leetCodeStats: generateLeetCodeStatsForHandle('kumaran_dev', 3)
     });
   };
 

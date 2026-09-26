@@ -83,7 +83,7 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
             {syncedSuccess && (
               <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-1.5">
                 <Sparkles size={14} className="text-emerald-600" />
-                <span>Synced handle '{handleInput}'! {completedCases.length} Completed Cases unlocked for AI Placement Tests.</span>
+                <span>Synced handle '{handleInput}'! Total Solved: {user.leetCodeStats?.totalSolved || 89}. {completedCases.length} Cases unlocked for AI Placement Tests.</span>
               </motion.div>
             )}
           </div>
@@ -92,15 +92,15 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
               <span className="text-[10px] font-bold text-emerald-800 uppercase">Easy Solved</span>
-              <h4 className="text-lg font-extrabold text-emerald-700">45</h4>
+              <h4 className="text-lg font-extrabold text-emerald-700">{user.leetCodeStats?.easy || 45}</h4>
             </div>
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
               <span className="text-[10px] font-bold text-amber-800 uppercase">Medium Solved</span>
-              <h4 className="text-lg font-extrabold text-amber-700">32</h4>
+              <h4 className="text-lg font-extrabold text-amber-700">{user.leetCodeStats?.medium || 32}</h4>
             </div>
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
               <span className="text-[10px] font-bold text-rose-800 uppercase">Hard Solved</span>
-              <h4 className="text-lg font-extrabold text-rose-700">12</h4>
+              <h4 className="text-lg font-extrabold text-rose-700">{user.leetCodeStats?.hard || 12}</h4>
             </div>
           </div>
 
