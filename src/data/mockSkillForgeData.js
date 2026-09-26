@@ -22,8 +22,7 @@ export const INITIAL_VALUE2 = {
     'Binary Search Trees',
     'DBMS: SQL Basics',
     'Verbal: PREP Framework',
-    'Quantitative: Time & Work',
-    'HR Interview: Behavioral Questions'
+    'Quantitative: Time & Work'
   ],
   difficultyLevelsMastered: {
     Easy: 92,
@@ -31,11 +30,10 @@ export const INITIAL_VALUE2 = {
     Hard: 58
   },
   weakAreas: ['SQL Joins & Indexing', 'Dynamic Programming', 'Grammar: Complex Prepositions'],
-  strongAreas: ['Binary Trees', 'Time & Work Problems', 'Python OOP', 'Self Introduction'],
+  strongAreas: ['Binary Trees', 'Time & Work Problems', 'Python OOP', 'Hash Tables'],
   frequentlyIncorrectConcepts: [
     'Left Outer Join vs Subqueries',
-    'Knapsack Space Optimization',
-    'Subject-Verb Agreement in Relative Clauses'
+    'Knapsack Space Optimization'
   ],
   accuracyPercentage: 81,
   practiceHistory: [
@@ -56,18 +54,8 @@ export const INITIAL_VALUE2 = {
       date: '2026-09-25T16:00:00Z'
     }
   ],
-  communicationLogs: [
-    {
-      id: 'cl1',
-      type: 'Mock HR Interview',
-      fluencyScore: 86,
-      grammarScore: 82,
-      vocabularyScore: 88,
-      confidenceScore: 85,
-      date: '2026-09-25T18:30:00Z'
-    }
-  ],
-  leetCodeSolvedCases: ['lc_1', 'lc_206']
+  communicationLogs: [],
+  leetCodeSolvedCases: ['lc_1', 'lc_206', 'lc_175']
 };
 
 export const LEETCODE_STUDY_CASES = [
@@ -75,6 +63,7 @@ export const LEETCODE_STUDY_CASES = [
     id: 'lc_1',
     title: '1. Two Sum',
     difficulty: 'Easy',
+    status: 'Completed', // Completed LeetCode Problem
     tags: ['Array', 'Hash Table'],
     learnedTopicRef: 'Python OOP & Classes',
     acceptance: '52.4%',
@@ -93,6 +82,7 @@ export const LEETCODE_STUDY_CASES = [
     id: 'lc_206',
     title: '206. Reverse Linked List',
     difficulty: 'Easy',
+    status: 'Completed', // Completed LeetCode Problem
     tags: ['Linked List', 'Recursion'],
     learnedTopicRef: 'Binary Search Trees',
     acceptance: '75.8%',
@@ -112,6 +102,7 @@ export const LEETCODE_STUDY_CASES = [
     id: 'lc_175',
     title: '175. Combine Two Tables (SQL)',
     difficulty: 'Easy',
+    status: 'Completed', // Completed LeetCode Problem
     tags: ['Database', 'SQL Joins'],
     learnedTopicRef: 'DBMS: SQL Basics',
     acceptance: '76.1%',
@@ -124,10 +115,12 @@ LEFT JOIN Address a ON p.personId = a.personId;`
     id: 'lc_98',
     title: '98. Validate Binary Search Tree',
     difficulty: 'Medium',
+    status: 'Unsolved', // NOT DONE in LeetCode -> Helps to Learn
     tags: ['Tree', 'Depth-First Search', 'BST'],
     learnedTopicRef: 'Binary Search Trees',
     acceptance: '32.9%',
     description: 'Given the root of a binary tree, determine if it is a valid binary search tree (BST).',
+    recommendationReason: 'Not completed on LeetCode. Review BST traversal in Learn module before taking tests!',
     solutionSnippet: `function isValidBST(root, min = null, max = null) {
     if (!root) return true;
     if ((min !== null && root.val <= min) || (max !== null && root.val >= max)) return false;
@@ -138,10 +131,12 @@ LEFT JOIN Address a ON p.personId = a.personId;`
     id: 'lc_322',
     title: '322. Coin Change (DP)',
     difficulty: 'Medium',
+    status: 'Unsolved', // NOT DONE in LeetCode -> Helps to Learn
     tags: ['Dynamic Programming', 'Breadth-First Search'],
-    learnedTopicRef: 'SQL Joins & Indexing',
+    learnedTopicRef: 'SQL Joins, Indexing & Subqueries',
     acceptance: '44.1%',
     description: 'Return the fewest number of coins that you need to make up a given amount using DP state transitions.',
+    recommendationReason: 'Not completed on LeetCode. Study Dynamic Programming memoization tables to learn!',
     solutionSnippet: `function coinChange(coins, amount) {
     const dp = new Array(amount + 1).fill(Infinity);
     dp[0] = 0;
@@ -286,26 +281,4 @@ export const PRACTICE_QUESTIONS = [
   }
 ];
 
-export const COMMUNICATION_SCENARIOS = [
-  {
-    id: 'cs1',
-    title: 'Mock HR Interview: Tell Me About Yourself',
-    section: 'Mock HR Interview',
-    prompt: 'Introduce yourself to the HR panel in 60 seconds highlighting your technical skills and academic background.',
-    tips: ['Keep duration between 45-60 seconds', 'Maintain confident pitch & eye contact', 'Structure: Past -> Present -> Future']
-  },
-  {
-    id: 'cs2',
-    title: 'Group Discussion: AI in Placements',
-    section: 'Group Discussion',
-    prompt: 'Present an opening statement on: "Will AI replace software engineering jobs or enhance developer productivity?"',
-    tips: ['Start with a balanced definition', 'Use transitional phrases like "In my perspective..."', 'Avoid extreme statements']
-  },
-  {
-    id: 'cs3',
-    title: 'Vocabulary & Grammar: Corporate Acumen',
-    section: 'Vocabulary Builder',
-    prompt: 'Pronounce and construct a business sentence using the word "Synergy" and "Pivotal".',
-    tips: ['Emphasize crisp enunciation', 'Ensure correct subject-verb agreement']
-  }
-];
+export const COMMUNICATION_SCENARIOS = [];

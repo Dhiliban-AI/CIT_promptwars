@@ -12,13 +12,15 @@ import {
   ArrowRight,
   Layers,
   ChevronRight,
-  Zap
+  Zap,
+  HelpCircle,
+  AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
 export const LearnPage = () => {
-  const { learnModules, value2, completeLesson, setActiveTab } = useSkillForge();
+  const { learnModules, leetCodeStudyCases, value2, completeLesson, setActiveTab } = useSkillForge();
 
   const categories = ['All', 'DBMS', 'Programming', 'Data Structures', 'Aptitude'];
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -30,6 +32,9 @@ export const LearnPage = () => {
     : learnModules.filter(m => m.category === selectedCategory);
 
   const isCompleted = value2.topicsStudied.includes(selectedModule.title);
+
+  // Unsolved LeetCode Study Cases (Help to Learn)
+  const unsolvedLeetCodeCases = leetCodeStudyCases.filter(lc => !(value2.leetCodeSolvedCases || []).includes(lc.id));
 
   const handleMarkCompleted = () => {
     if (!isCompleted) {
@@ -51,13 +56,13 @@ export const LearnPage = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-blue-200 border border-white/20 flex items-center gap-1.5">
-                <Database size={13} /> Data Collector Module
+                <Database size={13} /> LeetCode Guided Learn Center
               </span>
               <span className="text-xs font-medium text-slate-300">Feeds Value 2 Knowledge Profile</span>
             </div>
             <h2 className="text-2xl font-extrabold tracking-tight">Placement Training & Learn Center</h2>
             <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
-              Study placement curriculum topics, inspect interactive code snippets, and mark complete to update your <strong>Value 2</strong> profile.
+              Study concepts & master <strong>unsolved LeetCode topics</strong>. Topics completed here unlock personalized questions in your <strong>AI Placement Test</strong>.
             </p>
           </div>
 
@@ -65,6 +70,58 @@ export const LearnPage = () => {
             <span className="text-xs text-blue-200 block">Topics Completed</span>
             <span className="text-xl font-extrabold text-white">{value2.topicsStudied.length} / {learnModules.length}</span>
           </div>
+        </div>
+      </div>
+
+      {/* NEW WIDGET: LEETCODE UNSOLVED STUDY QUEUE ("HELP TO LEARN") */}
+      <div className="glass-card p-5 border-l-4 border-l-amber-500 bg-amber-50/40">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-amber-100 text-amber-800 font-bold">
+              <Code size={16} />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                LeetCode Unsolved Queue <span className="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">Help To Learn</span>
+              </h3>
+              <p className="text-xs text-slate-500">Topics not yet completed on LeetCode. Learn them here before attempting tests!</p>
+            </div>
+          </div>
+          <span className="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full">
+            {unsolvedLeetCodeCases.length} Pending Topics
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {unsolvedLeetCodeCases.map((lc) => {
+            const targetMod = learnModules.find(m => m.title.toLowerCase().includes(lc.learnedTopicRef.toLowerCase()) || lc.learnedTopicRef.toLowerCase().includes(m.title.toLowerCase())) || learnModules[0];
+
+            return (
+              <div 
+                key={lc.id} 
+                onClick={() => {
+                  setSelectedModule(targetMod);
+                  setIsVideoPlaying(false);
+                }}
+                className="p-3.5 rounded-xl bg-white border border-amber-200/80 hover:border-amber-400 transition cursor-pointer flex items-center justify-between shadow-2xs"
+              >
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-amber-100 text-amber-900">
+                      LeetCode {lc.title.split('.')[0]}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-semibold">{lc.tags.join(', ')}</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-900">{lc.title}</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Learn: <strong className="text-blue-600">{targetMod.title}</strong></p>
+                </div>
+
+                <button className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] transition flex items-center gap-1 cursor-pointer">
+                  Learn <ArrowRight size={12} />
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -234,7 +291,7 @@ export const LearnPage = () => {
             <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-center gap-3">
               <Database size={18} className="text-blue-600 shrink-0" />
               <div>
-                <strong>Value 2 Profile Pipeline:</strong> Clicking "Mark Topic as Completed" appends topic name, time spent, and updates skill level in Value 2.
+                <strong>Value 2 Profile Pipeline:</strong> Completing this topic adds it to Value 2 Learned Profile, making it available for dynamic test generation.
               </div>
             </div>
 

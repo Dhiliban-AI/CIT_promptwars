@@ -15,7 +15,9 @@ import {
   Sparkles,
   ExternalLink,
   Layers,
-  Award
+  Award,
+  AlertTriangle,
+  BookOpen
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -23,7 +25,7 @@ import confetti from 'canvas-confetti';
 export const PracticePage = () => {
   const { practiceQuestions, leetCodeStudyCases, value2, user, submitPracticeAnswer, solveLeetCodeCase, setActiveTab } = useSkillForge();
 
-  const [activeTabMode, setActiveTabMode] = useState('leetcode'); // 'leetcode' or 'drills'
+  const [activeTabMode, setActiveTabMode] = useState('leetcode');
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedQuestion, setSelectedQuestion] = useState(practiceQuestions[0]);
   const [selectedLCCase, setSelectedLCCase] = useState(leetCodeStudyCases[0]);
@@ -39,6 +41,9 @@ export const PracticePage = () => {
   const filteredQuestions = activeCategory === 'All'
     ? practiceQuestions
     : practiceQuestions.filter(q => q.category === activeCategory);
+
+  const completedLCCases = leetCodeStudyCases.filter(lc => (value2.leetCodeSolvedCases || []).includes(lc.id));
+  const unsolvedLCCases = leetCodeStudyCases.filter(lc => !(value2.leetCodeSolvedCases || []).includes(lc.id));
 
   const handleSelectQuestion = (q) => {
     setSelectedQuestion(q);
@@ -88,28 +93,27 @@ export const PracticePage = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-blue-200 border border-white/20 flex items-center gap-1.5">
-                <Code size={13} className="text-yellow-300" /> Technical & Aptitude Data Collector
+                <Code size={13} className="text-yellow-300" /> LeetCode Profile Integration
               </span>
-              <span className="text-xs font-medium text-slate-300">Connected to {user.leetCodeHandle}</span>
+              <span className="text-xs font-medium text-slate-300">Handle: {user.leetCodeHandle}</span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight">Technical Practice & LeetCode Lab</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">LeetCode Access & Technical Lab</h2>
             <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
-              Solve LeetCode Study Cases, Coding Problems, DBMS, Data Structures, and Aptitude Drills. Every completed case adds to your <strong>Value 2 Learned Profile</strong>.
+              <strong>Completed LeetCode Problems</strong> are used to attempt tests. <strong>Unsolved problems</strong> guide your Learn module study queue!
             </p>
           </div>
 
-          {/* LeetCode Sync Badge */}
           <div className="bg-white/10 p-3.5 rounded-xl border border-white/15 text-right space-y-1">
-            <div className="flex items-center justify-end gap-1 text-xs font-bold text-amber-300">
-              <Code size={14} /> LeetCode Synced
+            <div className="flex items-center justify-end gap-1 text-xs font-bold text-emerald-300">
+              <CheckCircle2 size={14} /> {completedLCCases.length} Used for Tests
             </div>
-            <span className="text-xl font-extrabold text-white">89 Solved</span>
-            <span className="block text-[10px] text-slate-300">Global Rank: #142,500</span>
+            <span className="text-xl font-extrabold text-white">{completedLCCases.length} / {leetCodeStudyCases.length}</span>
+            <span className="block text-[10px] text-amber-300">{unsolvedLCCases.length} Help to Learn Pending</span>
           </div>
         </div>
       </div>
 
-      {/* Workspace Sub-Tabs: LeetCode Study Cases vs Technical Drills */}
+      {/* Workspace Sub-Tabs */}
       <div className="flex gap-3 border-b border-slate-200 pb-2">
         <button
           onClick={() => setActiveTabMode('leetcode')}
@@ -140,9 +144,16 @@ export const PracticePage = () => {
           
           {/* Left Column: LeetCode Case Selector (4 columns) */}
           <div className="lg:col-span-4 space-y-3">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
-              Curated LeetCode Cases
-            </h3>
+            
+            {/* Completed vs Unsolved Status Badges */}
+            <div className="flex gap-2">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                <CheckCircle2 size={10} /> {completedLCCases.length} Solved (Test Ready)
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 flex items-center gap-1">
+                <AlertTriangle size={10} /> {unsolvedLCCases.length} Help to Learn
+              </span>
+            </div>
 
             <div className="space-y-2.5">
               {leetCodeStudyCases.map(lc => {
@@ -169,11 +180,11 @@ export const PracticePage = () => {
 
                       {isSolved ? (
                         <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <CheckCircle2 size={10} /> Solved & Learned
+                          <CheckCircle2 size={10} /> Solved (Used in Tests)
                         </span>
                       ) : (
-                        <span className="text-[10px] text-slate-400 font-semibold">
-                          Acceptance: {lc.acceptance}
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <BookOpen size={10} /> Help to Learn
                         </span>
                       )}
                     </div>
@@ -207,7 +218,7 @@ export const PracticePage = () => {
                       <Code size={12} /> LeetCode Case
                     </span>
                     <span className="text-xs font-bold text-slate-500">
-                      Maps to Learned Topic: <strong className="text-blue-600">{selectedLCCase.learnedTopicRef}</strong>
+                      Mapped Topic: <strong className="text-blue-600">{selectedLCCase.learnedTopicRef}</strong>
                     </span>
                   </div>
 
@@ -222,15 +233,42 @@ export const PracticePage = () => {
                   rel="noreferrer"
                   className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1"
                 >
-                  LeetCode <ExternalLink size={12} />
+                  LeetCode Problem <ExternalLink size={12} />
                 </a>
               </div>
 
+              {/* Status Banner */}
+              {(value2.leetCodeSolvedCases || []).includes(selectedLCCase.id) ? (
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+                  <div>
+                    <strong>Completed in LeetCode Profile:</strong> Topic <strong>"{selectedLCCase.learnedTopicRef}"</strong> is active in Value 2 and ready for AI Placement Test generation!
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle size={18} className="text-amber-600 shrink-0" />
+                    <div>
+                      <strong>Not Completed in LeetCode:</strong> Learn this concept in the Learn module to add it to your test queue!
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setActiveTab('learn')}
+                    className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs whitespace-nowrap transition cursor-pointer"
+                  >
+                    Go to Learn Module
+                  </button>
+                </div>
+              )}
+
+              {/* Description */}
               <div className="text-xs sm:text-sm text-slate-800 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <p className="font-bold mb-1 text-slate-900">Problem Description:</p>
                 {selectedLCCase.description}
               </div>
 
+              {/* Solution Code Snippet */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                   <Code size={14} className="text-blue-600" /> Optimal Solution Code
@@ -240,13 +278,14 @@ export const PracticePage = () => {
                 </div>
               </div>
 
+              {/* Actions & Value 2 Sync */}
               <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-xs text-blue-900 space-y-1">
                   <p className="font-bold flex items-center gap-1.5">
-                    <Database size={15} className="text-blue-600" /> Value 2 Profile Sync Constraint:
+                    <Database size={15} className="text-blue-600" /> Value 2 LeetCode Integration:
                   </p>
                   <p className="text-slate-600">
-                    Solving this case adds <strong>"{selectedLCCase.learnedTopicRef}"</strong> into Value 2 Learned Topics, enabling AI Test Engine to include it in future exams!
+                    Marking solved syncs <strong>"{selectedLCCase.learnedTopicRef}"</strong> to Value 2 for dynamic test creation!
                   </p>
                 </div>
 
@@ -255,11 +294,11 @@ export const PracticePage = () => {
                     onClick={() => handleSolveLeetCode(selectedLCCase)}
                     className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-md shadow-blue-600/20 whitespace-nowrap cursor-pointer flex items-center gap-1.5"
                   >
-                    <CheckCircle2 size={16} /> Mark Solved & Add to Value 2
+                    <CheckCircle2 size={16} /> Mark Solved & Unlock in Test Engine
                   </button>
                 ) : (
                   <span className="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold text-xs flex items-center gap-1.5 border border-emerald-300">
-                    <CheckCircle2 size={16} /> Case Solved & Added to Learned Topics!
+                    <CheckCircle2 size={16} /> Solved & Unlocked for Tests!
                   </span>
                 )}
               </div>
@@ -276,8 +315,6 @@ export const PracticePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           <div className="lg:col-span-4 space-y-3">
-            
-            {/* Category Filter */}
             <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
               {categories.map((cat, idx) => (
                 <button
