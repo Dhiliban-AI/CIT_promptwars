@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useSkillForge } from '../../context/SkillForgeContext';
-import { Flame, Sparkles, RotateCcw, LogOut, LogIn, Code, CheckCircle2 } from 'lucide-react';
+import { Flame, Sparkles, LogOut, Code, CheckCircle2 } from 'lucide-react';
 import { GoogleAuthModal } from '../Auth/GoogleAuthModal';
+import { LeetCodeModal } from '../LeetCode/LeetCodeModal';
 
 export const TopBar = () => {
-  const { user, logout, value1, resetAllProgress } = useSkillForge();
+  const { user, logout, value1 } = useSkillForge();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isLeetCodeModalOpen, setIsLeetCodeModalOpen] = useState(false);
 
   return (
     <>
@@ -32,18 +34,17 @@ export const TopBar = () => {
             <span>{value1.streakDays} Day Streak</span>
           </div>
 
-          {/* Reset Button */}
+          {/* Prominent LeetCode Profile Button (Replaces Reset Pipeline) */}
           <button
-            onClick={() => {
-              if (window.confirm('Reset all learned topics, test history, and accuracy metrics?')) {
-                resetAllProgress();
-              }
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition cursor-pointer"
-            title="Reset pipeline back to initial defaults"
+            onClick={() => setIsLeetCodeModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-amber-200/80 bg-amber-50/90 hover:bg-amber-100 text-amber-950 text-xs font-bold transition cursor-pointer shadow-2xs"
+            title="Access LeetCode Profile & Study Cases"
           >
-            <RotateCcw size={14} />
-            <span className="hidden sm:inline">Reset Pipeline</span>
+            <Code size={14} className="text-amber-600" />
+            <span>LeetCode</span>
+            <span className="text-[10px] bg-amber-200/70 text-amber-900 px-1.5 py-0.2 rounded-full font-extrabold hidden sm:inline-block">
+              {user.leetCodeHandle}
+            </span>
           </button>
 
           {/* User Auth / Profile Badge */}
@@ -99,6 +100,9 @@ export const TopBar = () => {
 
       {/* Google Auth Modal */}
       <GoogleAuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      {/* LeetCode Profile Modal */}
+      <LeetCodeModal isOpen={isLeetCodeModalOpen} onClose={() => setIsLeetCodeModalOpen(false)} />
     </>
   );
 };
