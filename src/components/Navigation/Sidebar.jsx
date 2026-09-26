@@ -5,6 +5,7 @@ import {
   BookOpen, 
   Target, 
   Award, 
+  Mic, 
   Sparkles, 
   TrendingUp, 
   CheckCircle2, 
@@ -21,7 +22,8 @@ export const Sidebar = () => {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: `${value1.readinessPercentage}% Ready` },
     { id: 'learn', label: 'Learn', icon: BookOpen, badge: `${value1.totalLessonsCompleted} Lessons` },
     { id: 'practice', label: 'Practice', icon: Target, badge: `${value1.totalPracticeQuestionsSolved} Solved` },
-    { id: 'test', label: 'Test Engine', icon: Award, badge: 'AI Generated' }
+    { id: 'test', label: 'Test Engine', icon: Award, badge: 'AI Generated' },
+    { id: 'communication', label: 'Communication', icon: Mic, badge: 'Voice & HR' }
   ];
 
   return (
@@ -66,7 +68,7 @@ export const Sidebar = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer ${
+                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
                   isActive 
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25' 
                     : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'

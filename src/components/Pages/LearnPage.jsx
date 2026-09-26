@@ -20,7 +20,7 @@ import confetti from 'canvas-confetti';
 export const LearnPage = () => {
   const { learnModules, value2, completeLesson, setActiveTab } = useSkillForge();
 
-  const categories = ['All', 'Aptitude', 'Programming', 'Data Structures', 'DBMS'];
+  const categories = ['All', 'DBMS', 'Programming', 'Data Structures', 'Aptitude'];
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedModule, setSelectedModule] = useState(learnModules[0]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -57,7 +57,7 @@ export const LearnPage = () => {
             </div>
             <h2 className="text-2xl font-extrabold tracking-tight">Placement Training & Learn Center</h2>
             <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
-              Study placement curriculum topics (Aptitude, Programming, Data Structures, DBMS). Mark complete to update your <strong>Value 2</strong> profile.
+              Study placement curriculum topics, inspect interactive code snippets, and mark complete to update your <strong>Value 2</strong> profile.
             </p>
           </div>
 

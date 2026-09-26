@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSkillForge } from '../../context/SkillForgeContext';
-import { LayoutDashboard, BookOpen, Target, Award } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Target, Award, Mic } from 'lucide-react';
 
 export const BottomNav = () => {
   const { activeTab, setActiveTab } = useSkillForge();
@@ -9,7 +9,8 @@ export const BottomNav = () => {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'learn', label: 'Learn', icon: BookOpen },
     { id: 'practice', label: 'Practice', icon: Target },
-    { id: 'test', label: 'Test', icon: Award }
+    { id: 'test', label: 'Test', icon: Award },
+    { id: 'communication', label: 'Comm', icon: Mic }
   ];
 
   return (
@@ -23,7 +24,7 @@ export const BottomNav = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center py-1 px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col items-center py-1 px-3 rounded-xl transition-all duration-200 ${
                 isActive ? 'text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-700'
               }`}
             >

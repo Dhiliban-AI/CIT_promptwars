@@ -23,7 +23,7 @@ import confetti from 'canvas-confetti';
 export const PracticePage = () => {
   const { practiceQuestions, leetCodeStudyCases, value2, user, submitPracticeAnswer, solveLeetCodeCase, setActiveTab } = useSkillForge();
 
-  const [activeTabMode, setActiveTabMode] = useState('leetcode');
+  const [activeTabMode, setActiveTabMode] = useState('leetcode'); // 'leetcode' or 'drills'
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedQuestion, setSelectedQuestion] = useState(practiceQuestions[0]);
   const [selectedLCCase, setSelectedLCCase] = useState(leetCodeStudyCases[0]);
@@ -34,11 +34,11 @@ export const PracticePage = () => {
   const [attemptSubmitted, setAttemptSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  const categories = ['All', 'DBMS', 'Programming', 'Data Structures', 'Aptitude'];
+  const categories = ['All', 'DBMS', 'Programming', 'Aptitude', 'Data Structures'];
 
   const filteredQuestions = activeCategory === 'All'
     ? practiceQuestions
-    : practiceQuestions.filter(q => q.category === activeCategory || q.type === activeCategory);
+    : practiceQuestions.filter(q => q.category === activeCategory);
 
   const handleSelectQuestion = (q) => {
     setSelectedQuestion(q);
@@ -53,7 +53,7 @@ export const PracticePage = () => {
     if (selectedQuestion.type === 'MCQ' || selectedQuestion.type === 'Aptitude Questions') {
       correct = selectedOption === selectedQuestion.correctIndex;
     } else {
-      correct = codeInputValue.includes('return') && codeInputValue.length > 20;
+      correct = codeInputValue.includes('return') && codeInputValue.length > 30;
     }
 
     setIsCorrect(correct);
@@ -88,13 +88,13 @@ export const PracticePage = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-blue-200 border border-white/20 flex items-center gap-1.5">
-                <Code size={13} className="text-yellow-300" /> LeetCode Study Cases & Practice Hub
+                <Code size={13} className="text-yellow-300" /> Technical & Aptitude Data Collector
               </span>
               <span className="text-xs font-medium text-slate-300">Connected to {user.leetCodeHandle}</span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight">Learn & Practice Core Lab</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">Technical Practice & LeetCode Lab</h2>
             <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
-              Solve LeetCode Study Cases & Placement Drills in Aptitude, Programming, Data Structures, and DBMS. Solved cases populate <strong>Value 2</strong> profile.
+              Solve LeetCode Study Cases, Coding Problems, DBMS, Data Structures, and Aptitude Drills. Every completed case adds to your <strong>Value 2 Learned Profile</strong>.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export const PracticePage = () => {
         </div>
       </div>
 
-      {/* Workspace Sub-Tabs: LeetCode Study Cases vs Placement Drills */}
+      {/* Workspace Sub-Tabs: LeetCode Study Cases vs Technical Drills */}
       <div className="flex gap-3 border-b border-slate-200 pb-2">
         <button
           onClick={() => setActiveTabMode('leetcode')}
@@ -130,7 +130,7 @@ export const PracticePage = () => {
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          <Target size={16} /> Placement MCQ & Coding Drills
+          <Target size={16} /> Technical MCQ & Aptitude Drills
         </button>
       </div>
 
@@ -200,7 +200,6 @@ export const PracticePage = () => {
             
             <div className="glass-card p-6 space-y-6">
               
-              {/* LeetCode Header */}
               <div className="flex justify-between items-start border-b border-slate-200/70 pb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -227,13 +226,11 @@ export const PracticePage = () => {
                 </a>
               </div>
 
-              {/* Description */}
               <div className="text-xs sm:text-sm text-slate-800 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <p className="font-bold mb-1 text-slate-900">Problem Description:</p>
                 {selectedLCCase.description}
               </div>
 
-              {/* Solution Code Snippet */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                   <Code size={14} className="text-blue-600" /> Optimal Solution Code
@@ -243,14 +240,13 @@ export const PracticePage = () => {
                 </div>
               </div>
 
-              {/* Actions & Value 2 Sync */}
               <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-xs text-blue-900 space-y-1">
                   <p className="font-bold flex items-center gap-1.5">
                     <Database size={15} className="text-blue-600" /> Value 2 Profile Sync Constraint:
                   </p>
                   <p className="text-slate-600">
-                    Solving this case adds <strong>"{selectedLCCase.learnedTopicRef}"</strong> into Value 2 Learned Topics for dynamic test generation!
+                    Solving this case adds <strong>"{selectedLCCase.learnedTopicRef}"</strong> into Value 2 Learned Topics, enabling AI Test Engine to include it in future exams!
                   </p>
                 </div>
 
@@ -275,14 +271,28 @@ export const PracticePage = () => {
         </div>
       )}
 
-      {/* MODE 2: PLACEMENT DRILLS WORKSPACE */}
+      {/* MODE 2: TECHNICAL DRILLS WORKSPACE */}
       {activeTabMode === 'drills' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           <div className="lg:col-span-4 space-y-3">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
-              Practice Drill Items ({filteredQuestions.length})
-            </h3>
+            
+            {/* Category Filter */}
+            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              {categories.map((cat, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition cursor-pointer ${
+                    activeCategory === cat 
+                      ? 'bg-blue-600 text-white shadow-xs' 
+                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
 
             <div className="space-y-2.5">
               {filteredQuestions.map(q => {

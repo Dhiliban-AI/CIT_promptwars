@@ -1,9 +1,9 @@
 export const INITIAL_VALUE1 = {
-  totalLessonsCompleted: 18,
-  totalPracticeQuestionsSolved: 132,
-  learningHours: 32.0,
+  totalLessonsCompleted: 24,
+  totalPracticeQuestionsSolved: 148,
+  learningHours: 36.5,
   currentSkillLevel: 'Level 4 - Placement Ready',
-  readinessPercentage: 86,
+  readinessPercentage: 84,
   streakDays: 7,
   weeklyProgress: [
     { day: 'Mon', hours: 2.5, questions: 15 },
@@ -21,20 +21,23 @@ export const INITIAL_VALUE2 = {
     'Python OOP & Classes',
     'Binary Search Trees',
     'DBMS: SQL Basics',
-    'Quantitative: Time & Work'
+    'Verbal: PREP Framework',
+    'Quantitative: Time & Work',
+    'HR Interview: Behavioral Questions'
   ],
   difficultyLevelsMastered: {
-    Easy: 94,
-    Medium: 80,
-    Hard: 62
+    Easy: 92,
+    Medium: 78,
+    Hard: 58
   },
-  weakAreas: ['SQL Joins & Indexing', 'Dynamic Programming'],
-  strongAreas: ['Binary Trees', 'Time & Work Problems', 'Python OOP'],
+  weakAreas: ['SQL Joins & Indexing', 'Dynamic Programming', 'Grammar: Complex Prepositions'],
+  strongAreas: ['Binary Trees', 'Time & Work Problems', 'Python OOP', 'Self Introduction'],
   frequentlyIncorrectConcepts: [
     'Left Outer Join vs Subqueries',
-    'Knapsack Space Optimization'
+    'Knapsack Space Optimization',
+    'Subject-Verb Agreement in Relative Clauses'
   ],
-  accuracyPercentage: 84,
+  accuracyPercentage: 81,
   practiceHistory: [
     { id: 'ph1', topic: 'Binary Search Trees', category: 'Data Structures', difficulty: 'Medium', correct: 4, total: 5, timeTaken: '6m 10s', date: '2026-09-25T10:30:00Z' },
     { id: 'ph2', topic: 'SQL Joins & Indexing', category: 'DBMS', difficulty: 'Hard', correct: 2, total: 5, timeTaken: '8m 45s', date: '2026-09-25T14:15:00Z' },
@@ -44,13 +47,24 @@ export const INITIAL_VALUE2 = {
     {
       id: 'th1',
       title: 'TCS & Infosys Placement Diagnostic Test',
-      scorePct: 78,
-      accuracyPct: 82,
+      scorePct: 76,
+      accuracyPct: 79,
       timeTaken: '18m 40s',
-      rankPrediction: '#28 / 1,450 Candidates',
+      rankPrediction: '#38 / 1,450 Candidates',
       strengths: ['Quantitative Aptitude', 'Binary Tree Traversal'],
       weaknesses: ['SQL Subqueries', 'Pointers'],
       date: '2026-09-25T16:00:00Z'
+    }
+  ],
+  communicationLogs: [
+    {
+      id: 'cl1',
+      type: 'Mock HR Interview',
+      fluencyScore: 86,
+      grammarScore: 82,
+      vocabularyScore: 88,
+      confidenceScore: 85,
+      date: '2026-09-25T18:30:00Z'
     }
   ],
   leetCodeSolvedCases: ['lc_1', 'lc_206']
@@ -262,11 +276,36 @@ export const PRACTICE_QUESTIONS = [
   {
     id: 'pq4',
     category: 'Data Structures',
-    type: 'Coding Problem',
-    title: 'Binary Tree Inorder Traversal',
-    question: 'Given the root of a binary tree, return the inorder traversal of its nodes values.',
-    initialCode: `function inorderTraversal(root) {\n  const res = [];\n  function helper(node) {\n    if (!node) return;\n    helper(node.left);\n    res.push(node.val);\n    helper(node.right);\n  }\n  helper(root);\n  return res;\n}`,
+    type: 'MCQ',
+    title: 'BST Inorder Traversal',
+    question: 'In a Binary Search Tree (BST), which traversal algorithm visits nodes in strictly ascending sorted order?',
+    options: ['Preorder Traversal', 'Inorder Traversal', 'Postorder Traversal', 'Level-order BFS'],
+    correctIndex: 1,
     difficulty: 'Medium',
-    explanation: 'Inorder traversal visits Left subtree -> Root node -> Right subtree.'
+    explanation: 'Inorder Traversal (Left, Root, Right) processes nodes in ascending order in a Binary Search Tree.'
+  }
+];
+
+export const COMMUNICATION_SCENARIOS = [
+  {
+    id: 'cs1',
+    title: 'Mock HR Interview: Tell Me About Yourself',
+    section: 'Mock HR Interview',
+    prompt: 'Introduce yourself to the HR panel in 60 seconds highlighting your technical skills and academic background.',
+    tips: ['Keep duration between 45-60 seconds', 'Maintain confident pitch & eye contact', 'Structure: Past -> Present -> Future']
+  },
+  {
+    id: 'cs2',
+    title: 'Group Discussion: AI in Placements',
+    section: 'Group Discussion',
+    prompt: 'Present an opening statement on: "Will AI replace software engineering jobs or enhance developer productivity?"',
+    tips: ['Start with a balanced definition', 'Use transitional phrases like "In my perspective..."', 'Avoid extreme statements']
+  },
+  {
+    id: 'cs3',
+    title: 'Vocabulary & Grammar: Corporate Acumen',
+    section: 'Vocabulary Builder',
+    prompt: 'Pronounce and construct a business sentence using the word "Synergy" and "Pivotal".',
+    tips: ['Emphasize crisp enunciation', 'Ensure correct subject-verb agreement']
   }
 ];

@@ -7,6 +7,7 @@ import { DashboardPage } from './components/Pages/DashboardPage';
 import { LearnPage } from './components/Pages/LearnPage';
 import { PracticePage } from './components/Pages/PracticePage';
 import { TestPage } from './components/Pages/TestPage';
+import { CommunicationPage } from './components/Pages/CommunicationPage';
 
 const MainViewRouter = () => {
   const { activeTab } = useSkillForge();
@@ -17,6 +18,7 @@ const MainViewRouter = () => {
       {activeTab === 'learn' && <LearnPage />}
       {activeTab === 'practice' && <PracticePage />}
       {activeTab === 'test' && <TestPage />}
+      {activeTab === 'communication' && <CommunicationPage />}
     </div>
   );
 };
