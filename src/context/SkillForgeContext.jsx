@@ -26,10 +26,19 @@ export const SkillForgeProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : INITIAL_VALUE1;
   });
 
-  // Persistent VALUE 2 state
+  // Persistent VALUE 2 state (Ensure fallback for leetCodeSolvedCases)
   const [value2, setValue2] = useState(() => {
     const saved = localStorage.getItem('skillforge_value2');
-    return saved ? JSON.parse(saved) : INITIAL_VALUE2;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        ...parsed,
+        leetCodeSolvedCases: parsed.leetCodeSolvedCases && parsed.leetCodeSolvedCases.length > 0
+          ? parsed.leetCodeSolvedCases
+          : ['lc_1', 'lc_206', 'lc_175']
+      };
+    }
+    return INITIAL_VALUE2;
   });
 
   useEffect(() => {
@@ -44,6 +53,37 @@ export const SkillForgeProvider = ({ children }) => {
     localStorage.setItem('skillforge_value2', JSON.stringify(value2));
   }, [value2]);
 
+  // Sync LeetCode Profile Handle Action
+  const syncLeetCodeProfile = (newHandle) => {
+    const handle = newHandle.trim() || 'kumaran_dev';
+    setUser(prev => ({
+      ...prev,
+      leetCodeHandle: handle,
+      leetCodeConnected: true
+    }));
+
+    setValue2(prev => {
+      const solvedList = Array.from(new Set([...(prev.leetCodeSolvedCases || []), 'lc_1', 'lc_206', 'lc_175']));
+      const learnedList = Array.from(new Set([
+        ...prev.topicsStudied,
+        'Python OOP & Classes',
+        'Binary Search Trees',
+        'DBMS: SQL Basics'
+      ]));
+
+      return {
+        ...prev,
+        leetCodeSolvedCases: solvedList,
+        topicsStudied: learnedList
+      };
+    });
+
+    setValue1(prev => ({
+      ...prev,
+      readinessPercentage: Math.min(99, prev.readinessPercentage + 2)
+    }));
+  };
+
   // Auth Functions
   const loginWithGoogle = (account) => {
     setUser({
@@ -55,6 +95,7 @@ export const SkillForgeProvider = ({ children }) => {
       leetCodeConnected: true,
       leetCodeHandle: account.name.toLowerCase().replace(/\s+/g, '_') + '_lc'
     });
+    syncLeetCodeProfile(account.name.toLowerCase().replace(/\s+/g, '_') + '_lc');
   };
 
   const logout = () => {
@@ -89,7 +130,6 @@ export const SkillForgeProvider = ({ children }) => {
 
     setValue2(prev => {
       const updatedSolved = Array.from(new Set([...(prev.leetCodeSolvedCases || []), lcCase.id]));
-      // Automatically add the corresponding topic to topicsStudied so it can be tested!
       const updatedTopics = Array.from(new Set([...prev.topicsStudied, lcCase.learnedTopicRef]));
 
       return {
@@ -195,7 +235,6 @@ export const SkillForgeProvider = ({ children }) => {
   const getLearnedTestQuestions = () => {
     const studied = value2.topicsStudied || [];
     
-    // Filter practice questions where category or title matches any studied topic in Value 2
     const filtered = PRACTICE_QUESTIONS.filter(q => {
       return studied.some(topic => 
         topic.toLowerCase().includes(q.category.toLowerCase()) || 
@@ -204,7 +243,6 @@ export const SkillForgeProvider = ({ children }) => {
       );
     });
 
-    // If filtered list is small, fallback to questions whose categories are studied
     return filtered.length > 0 ? filtered : PRACTICE_QUESTIONS;
   };
 
@@ -233,6 +271,7 @@ export const SkillForgeProvider = ({ children }) => {
       user,
       loginWithGoogle,
       logout,
+      syncLeetCodeProfile,
       value1,
       value2,
       learnModules: LEARN_MODULES,

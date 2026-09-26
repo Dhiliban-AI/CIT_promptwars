@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
 import { useSkillForge } from '../../context/SkillForgeContext';
-import { X, Code, CheckCircle2, AlertTriangle, ExternalLink, ArrowRight, RefreshCw } from 'lucide-react';
+import { X, Code, CheckCircle2, AlertTriangle, ExternalLink, ArrowRight, RefreshCw, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const LeetCodeModal = ({ isOpen, onClose }) => {
-  const { user, value2, leetCodeStudyCases, setActiveTab } = useSkillForge();
+  const { user, value2, leetCodeStudyCases, syncLeetCodeProfile, setActiveTab } = useSkillForge();
   const [handleInput, setHandleInput] = useState(user.leetCodeHandle || 'kumaran_dev');
   const [isSyncing, setIsSyncing] = useState(false);
+  const [syncedSuccess, setSyncedSuccess] = useState(false);
 
-  const completedCases = leetCodeStudyCases.filter(lc => (value2.leetCodeSolvedCases || []).includes(lc.id));
-  const pendingCases = leetCodeStudyCases.filter(lc => !(value2.leetCodeSolvedCases || []).includes(lc.id));
+  const solvedSet = value2.leetCodeSolvedCases && value2.leetCodeSolvedCases.length > 0
+    ? value2.leetCodeSolvedCases
+    : ['lc_1', 'lc_206', 'lc_175'];
+
+  const completedCases = leetCodeStudyCases.filter(lc => solvedSet.includes(lc.id));
+  const pendingCases = leetCodeStudyCases.filter(lc => !solvedSet.includes(lc.id));
 
   const handleSync = () => {
     setIsSyncing(true);
+    setSyncedSuccess(false);
+    
     setTimeout(() => {
+      syncLeetCodeProfile(handleInput);
       setIsSyncing(false);
-    }, 800);
+      setSyncedSuccess(true);
+    }, 600);
   };
 
   if (!isOpen) return null;
@@ -64,12 +73,19 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
               />
               <button
                 onClick={handleSync}
-                className="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs whitespace-nowrap"
               >
                 <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
                 {isSyncing ? 'Syncing...' : 'Sync Handle'}
               </button>
             </div>
+
+            {syncedSuccess && (
+              <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-1.5">
+                <Sparkles size={14} className="text-emerald-600" />
+                <span>Synced handle '{handleInput}'! {completedCases.length} Completed Cases unlocked for AI Placement Tests.</span>
+              </motion.div>
+            )}
           </div>
 
           {/* LeetCode Solved Stats Grid */}
@@ -90,13 +106,17 @@ export const LeetCodeModal = ({ isOpen, onClose }) => {
 
           {/* Pipeline Information */}
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-slate-800">Completed Cases (Used in Tests):</span>
-              <span className="font-bold text-emerald-600">{completedCases.length} Cases</span>
+            <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 border border-slate-200">
+              <span className="font-bold text-slate-800 flex items-center gap-1">
+                <CheckCircle2 size={13} className="text-emerald-600" /> Completed Cases (Used in Tests):
+              </span>
+              <span className="font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">{completedCases.length} Cases</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-slate-800">Pending Cases (Help to Learn Queue):</span>
-              <span className="font-bold text-amber-600">{pendingCases.length} Cases</span>
+            <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 border border-slate-200">
+              <span className="font-bold text-slate-800 flex items-center gap-1">
+                <AlertTriangle size={13} className="text-amber-600" /> Pending Cases (Help to Learn Queue):
+              </span>
+              <span className="font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">{pendingCases.length} Cases</span>
             </div>
           </div>
 
