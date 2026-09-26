@@ -23,7 +23,7 @@ import confetti from 'canvas-confetti';
 export const PracticePage = () => {
   const { practiceQuestions, leetCodeStudyCases, value2, user, submitPracticeAnswer, solveLeetCodeCase, setActiveTab } = useSkillForge();
 
-  const [activeTabMode, setActiveTabMode] = useState('leetcode'); // 'leetcode' or 'drills'
+  const [activeTabMode, setActiveTabMode] = useState('leetcode');
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedQuestion, setSelectedQuestion] = useState(practiceQuestions[0]);
   const [selectedLCCase, setSelectedLCCase] = useState(leetCodeStudyCases[0]);
@@ -34,7 +34,7 @@ export const PracticePage = () => {
   const [attemptSubmitted, setAttemptSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  const categories = ['All', 'DBMS', 'Programming', 'Aptitude', 'Interview Questions'];
+  const categories = ['All', 'DBMS', 'Programming', 'Data Structures', 'Aptitude'];
 
   const filteredQuestions = activeCategory === 'All'
     ? practiceQuestions
@@ -50,10 +50,10 @@ export const PracticePage = () => {
 
   const handleAnswerSubmit = () => {
     let correct = false;
-    if (selectedQuestion.type === 'MCQ' || selectedQuestion.type === 'Aptitude Questions' || selectedQuestion.type === 'Interview Questions') {
+    if (selectedQuestion.type === 'MCQ' || selectedQuestion.type === 'Aptitude Questions') {
       correct = selectedOption === selectedQuestion.correctIndex;
     } else {
-      correct = codeInputValue.includes('return') && codeInputValue.length > 30;
+      correct = codeInputValue.includes('return') && codeInputValue.length > 20;
     }
 
     setIsCorrect(correct);
@@ -88,13 +88,13 @@ export const PracticePage = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-blue-200 border border-white/20 flex items-center gap-1.5">
-                <Code size={13} className="text-yellow-300" /> LeetCode Study Cases & Data Collector
+                <Code size={13} className="text-yellow-300" /> LeetCode Study Cases & Practice Hub
               </span>
               <span className="text-xs font-medium text-slate-300">Connected to {user.leetCodeHandle}</span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight">Placement Practice & LeetCode Integration</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">Learn & Practice Core Lab</h2>
             <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
-              Solve LeetCode Study Cases & Placement Drills. Solved study cases automatically update your <strong>Value 2 Learned Profile</strong> to generate personalized tests.
+              Solve LeetCode Study Cases & Placement Drills in Aptitude, Programming, Data Structures, and DBMS. Solved cases populate <strong>Value 2</strong> profile.
             </p>
           </div>
 
@@ -130,7 +130,7 @@ export const PracticePage = () => {
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          <Target size={16} /> Placement MCQ & Aptitude Drills
+          <Target size={16} /> Placement MCQ & Coding Drills
         </button>
       </div>
 
@@ -250,7 +250,7 @@ export const PracticePage = () => {
                     <Database size={15} className="text-blue-600" /> Value 2 Profile Sync Constraint:
                   </p>
                   <p className="text-slate-600">
-                    Solving this case adds <strong>"{selectedLCCase.learnedTopicRef}"</strong> into Value 2 Learned Topics, enabling AI Test Engine to include it in future exams!
+                    Solving this case adds <strong>"{selectedLCCase.learnedTopicRef}"</strong> into Value 2 Learned Topics for dynamic test generation!
                   </p>
                 </div>
 

@@ -1,9 +1,9 @@
 export const INITIAL_VALUE1 = {
-  totalLessonsCompleted: 24,
-  totalPracticeQuestionsSolved: 148,
-  learningHours: 36.5,
+  totalLessonsCompleted: 18,
+  totalPracticeQuestionsSolved: 132,
+  learningHours: 32.0,
   currentSkillLevel: 'Level 4 - Placement Ready',
-  readinessPercentage: 84,
+  readinessPercentage: 86,
   streakDays: 7,
   weeklyProgress: [
     { day: 'Mon', hours: 2.5, questions: 15 },
@@ -21,23 +21,20 @@ export const INITIAL_VALUE2 = {
     'Python OOP & Classes',
     'Binary Search Trees',
     'DBMS: SQL Basics',
-    'Verbal: PREP Framework',
-    'Quantitative: Time & Work',
-    'HR Interview: Behavioral Questions'
+    'Quantitative: Time & Work'
   ],
   difficultyLevelsMastered: {
-    Easy: 92,
-    Medium: 78,
-    Hard: 58
+    Easy: 94,
+    Medium: 80,
+    Hard: 62
   },
-  weakAreas: ['SQL Joins & Indexing', 'Dynamic Programming', 'Grammar: Complex Prepositions'],
-  strongAreas: ['Binary Trees', 'Time & Work Problems', 'Python OOP', 'Self Introduction'],
+  weakAreas: ['SQL Joins & Indexing', 'Dynamic Programming'],
+  strongAreas: ['Binary Trees', 'Time & Work Problems', 'Python OOP'],
   frequentlyIncorrectConcepts: [
     'Left Outer Join vs Subqueries',
-    'Knapsack Space Optimization',
-    'Subject-Verb Agreement in Relative Clauses'
+    'Knapsack Space Optimization'
   ],
-  accuracyPercentage: 81,
+  accuracyPercentage: 84,
   practiceHistory: [
     { id: 'ph1', topic: 'Binary Search Trees', category: 'Data Structures', difficulty: 'Medium', correct: 4, total: 5, timeTaken: '6m 10s', date: '2026-09-25T10:30:00Z' },
     { id: 'ph2', topic: 'SQL Joins & Indexing', category: 'DBMS', difficulty: 'Hard', correct: 2, total: 5, timeTaken: '8m 45s', date: '2026-09-25T14:15:00Z' },
@@ -47,24 +44,13 @@ export const INITIAL_VALUE2 = {
     {
       id: 'th1',
       title: 'TCS & Infosys Placement Diagnostic Test',
-      scorePct: 76,
-      accuracyPct: 79,
+      scorePct: 78,
+      accuracyPct: 82,
       timeTaken: '18m 40s',
-      rankPrediction: '#38 / 1,450 Candidates',
+      rankPrediction: '#28 / 1,450 Candidates',
       strengths: ['Quantitative Aptitude', 'Binary Tree Traversal'],
       weaknesses: ['SQL Subqueries', 'Pointers'],
       date: '2026-09-25T16:00:00Z'
-    }
-  ],
-  communicationLogs: [
-    {
-      id: 'cl1',
-      type: 'Mock HR Interview',
-      fluencyScore: 86,
-      grammarScore: 82,
-      vocabularyScore: 88,
-      confidenceScore: 85,
-      date: '2026-09-25T18:30:00Z'
     }
   ],
   leetCodeSolvedCases: ['lc_1', 'lc_206']
@@ -139,7 +125,7 @@ LEFT JOIN Address a ON p.personId = a.personId;`
     title: '322. Coin Change (DP)',
     difficulty: 'Medium',
     tags: ['Dynamic Programming', 'Breadth-First Search'],
-    learnedTopicRef: 'SQL Joins & Indexing', // Weak area case
+    learnedTopicRef: 'SQL Joins & Indexing',
     acceptance: '44.1%',
     description: 'Return the fewest number of coins that you need to make up a given amount using DP state transitions.',
     solutionSnippet: `function coinChange(coins, amount) {
@@ -237,45 +223,6 @@ console.log("Combined Days:", combinedDays); // 6 days`
         
     def announce(self):
         return f"{self.name} is preparing for {self.target_company}!"`
-  },
-  {
-    id: 'comm_prep_speaking',
-    category: 'Communication Skills',
-    title: 'Verbal: PREP Framework',
-    duration: '30 mins',
-    level: 'Easy',
-    videoUrl: 'https://www.youtube.com/embed/comm12345',
-    videoThumbnail: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
-    summary: 'Structuring interview responses with Point, Reason, Example, and Point to deliver concise, compelling answers.',
-    notes: [
-      'Point: State your primary takeaway clearly in the first 5 seconds.',
-      'Reason: Provide the logical justification or core principle.',
-      'Example: Share a concrete 30-second story or scenario.',
-      'Point: Reiterate your main conclusion.'
-    ],
-    interactiveSnippet: `Sample Response:
-Point: "I specialize in backend optimization using Node.js."
-Reason: "Because asynchronous non-blocking I/O scales gracefully."
-Example: "In my college project, I reduced endpoint latency by 40% using Redis caching."
-Point: "That is why I am eager to contribute to your cloud team."`
-  },
-  {
-    id: 'hr_interview_prep',
-    category: 'Interview Preparation',
-    title: 'HR Interview: Behavioral Questions',
-    duration: '45 mins',
-    level: 'Advanced',
-    videoUrl: 'https://www.youtube.com/embed/hr998877',
-    videoThumbnail: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=80',
-    summary: 'Mastering "Tell Me About Yourself", salary expectations, handling weakness questions, and company research.',
-    notes: [
-      'Use the Past-Present-Future structure for "Tell Me About Yourself".',
-      'When stating a weakness, mention the active steps you are taking to overcome it.'
-    ],
-    interactiveSnippet: `Key Checklist:
-1. Past: Computer Science Academic Background
-2. Present: Mastery of DSA, Web Technologies & Communication
-3. Future: Excited to build scalable systems at your company`
   }
 ];
 
@@ -314,42 +261,12 @@ export const PRACTICE_QUESTIONS = [
   },
   {
     id: 'pq4',
-    category: 'Interview Questions',
-    type: 'Interview Questions',
-    title: 'Microservices vs Monolith',
-    question: 'In a campus recruitment technical interview, how would you justify choosing Microservices over a Monolithic architecture?',
-    options: [
-      'Microservices are always simpler to deploy than monoliths.',
-      'Independent scalability, fault isolation, and technology flexibility for team sub-domains.',
-      'Microservices require zero database configuration.',
-      'Monoliths cannot be written in Python.'
-    ],
-    correctIndex: 1,
+    category: 'Data Structures',
+    type: 'Coding Problem',
+    title: 'Binary Tree Inorder Traversal',
+    question: 'Given the root of a binary tree, return the inorder traversal of its nodes values.',
+    initialCode: `function inorderTraversal(root) {\n  const res = [];\n  function helper(node) {\n    if (!node) return;\n    helper(node.left);\n    res.push(node.val);\n    helper(node.right);\n  }\n  helper(root);\n  return res;\n}`,
     difficulty: 'Medium',
-    explanation: 'Microservices allow independent deployment cycles and fault isolation, though they add distributed network complexity.'
-  }
-];
-
-export const COMMUNICATION_SCENARIOS = [
-  {
-    id: 'cs1',
-    title: 'Mock HR Interview: Tell Me About Yourself',
-    section: 'Mock HR Interview',
-    prompt: 'Introduce yourself to the HR panel in 60 seconds highlighting your technical skills and academic background.',
-    tips: ['Keep duration between 45-60 seconds', 'Maintain confident pitch & eye contact', 'Structure: Past -> Present -> Future']
-  },
-  {
-    id: 'cs2',
-    title: 'Group Discussion: AI in Placements',
-    section: 'Group Discussion',
-    prompt: 'Present an opening statement on: "Will AI replace software engineering jobs or enhance developer productivity?"',
-    tips: ['Start with a balanced definition', 'Use transitional phrases like "In my perspective..."', 'Avoid extreme statements']
-  },
-  {
-    id: 'cs3',
-    title: 'Vocabulary & Grammar: Corporate Acumen',
-    section: 'Vocabulary Builder',
-    prompt: 'Pronounce and construct a business sentence using the word "Synergy" and "Pivotal".',
-    tips: ['Emphasize crisp enunciation', 'Ensure correct subject-verb agreement']
+    explanation: 'Inorder traversal visits Left subtree -> Root node -> Right subtree.'
   }
 ];

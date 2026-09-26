@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_VALUE1, INITIAL_VALUE2, LEARN_MODULES, PRACTICE_QUESTIONS, COMMUNICATION_SCENARIOS, LEETCODE_STUDY_CASES } from '../data/mockSkillForgeData';
+import { INITIAL_VALUE1, INITIAL_VALUE2, LEARN_MODULES, PRACTICE_QUESTIONS, LEETCODE_STUDY_CASES } from '../data/mockSkillForgeData';
 
 const SkillForgeContext = createContext();
 
@@ -89,7 +89,6 @@ export const SkillForgeProvider = ({ children }) => {
 
     setValue2(prev => {
       const updatedSolved = Array.from(new Set([...(prev.leetCodeSolvedCases || []), lcCase.id]));
-      // Automatically add the corresponding topic to topicsStudied so it can be tested!
       const updatedTopics = Array.from(new Set([...prev.topicsStudied, lcCase.learnedTopicRef]));
 
       return {
@@ -173,29 +172,10 @@ export const SkillForgeProvider = ({ children }) => {
     }));
   };
 
-  // Action 5: Submit Communication Studio Session
-  const submitCommunicationSession = (type, fluency, grammar, vocabulary, confidence) => {
-    const newLog = {
-      id: 'cl_' + Date.now(),
-      type,
-      fluencyScore: fluency,
-      grammarScore: grammar,
-      vocabularyScore: vocabulary,
-      confidenceScore: confidence,
-      date: new Date().toISOString()
-    };
-
-    setValue2(prev => ({
-      ...prev,
-      communicationLogs: [newLog, ...prev.communicationLogs]
-    }));
-  };
-
   // STRICT TEST FILTER: Ensures questions in test MUST match topics studied in Value 2!
   const getLearnedTestQuestions = () => {
     const studied = value2.topicsStudied || [];
     
-    // Filter practice questions where category or title matches any studied topic in Value 2
     const filtered = PRACTICE_QUESTIONS.filter(q => {
       return studied.some(topic => 
         topic.toLowerCase().includes(q.category.toLowerCase()) || 
@@ -204,11 +184,10 @@ export const SkillForgeProvider = ({ children }) => {
       );
     });
 
-    // If filtered list is small, fallback to questions whose categories are studied
     return filtered.length > 0 ? filtered : PRACTICE_QUESTIONS;
   };
 
-  // Action 6: Reset Data back to initial defaults
+  // Action 5: Reset Data back to initial defaults
   const resetAllProgress = () => {
     localStorage.removeItem('skillforge_user');
     localStorage.removeItem('skillforge_value1');
@@ -238,12 +217,10 @@ export const SkillForgeProvider = ({ children }) => {
       learnModules: LEARN_MODULES,
       practiceQuestions: PRACTICE_QUESTIONS,
       leetCodeStudyCases: LEETCODE_STUDY_CASES,
-      communicationScenarios: COMMUNICATION_SCENARIOS,
       completeLesson,
       solveLeetCodeCase,
       submitPracticeAnswer,
       submitTestResult,
-      submitCommunicationSession,
       getLearnedTestQuestions,
       resetAllProgress
     }}>
