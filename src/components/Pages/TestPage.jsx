@@ -14,23 +14,25 @@ import {
   BarChart3,
   TrendingUp,
   AlertTriangle,
-  Layers
+  Layers,
+  BookOpen,
+  Lock,
+  Code
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import confetti from 'canvas-confetti';
 
 export const TestPage = () => {
-  const { value2, practiceQuestions, submitTestResult, setActiveTab } = useSkillForge();
+  const { value2, getLearnedTestQuestions, submitTestResult, setActiveTab } = useSkillForge();
 
-  const [testState, setTestState] = useState('idle'); // 'idle', 'exam', 'results'
+  const [testState, setTestState] = useState('idle');
   const [examQuestions, setExamQuestions] = useState([]);
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(180);
   const [testReport, setTestReport] = useState(null);
 
-  // Timer loop in exam mode
   useEffect(() => {
     let timer = null;
     if (testState === 'exam' && timeLeft > 0) {
@@ -43,12 +45,13 @@ export const TestPage = () => {
     return () => clearInterval(timer);
   }, [testState, timeLeft]);
 
-  // AI Dynamic Test Generator from Value 2 Profile
-  const generateAITest = () => {
-    // Collect questions matching studied topics & weak areas in Value 2
-    let pool = [...practiceQuestions];
-    
-    // Prioritize weak area questions
+  // AI Dynamic Test Generator STRICTLY FROM LEARNED THINGS
+  const generateAITestFromLearned = () => {
+    // Retrieve strictly learned test questions using getLearnedTestQuestions()
+    const learnedPool = getLearnedTestQuestions();
+
+    // Sort by weak area priority if available
+    let pool = [...learnedPool];
     pool.sort((a, b) => {
       const aIsWeak = value2.weakAreas.some(w => w.includes(a.category) || w.includes(a.title));
       const bIsWeak = value2.weakAreas.some(w => w.includes(b.category) || w.includes(b.title));
@@ -109,7 +112,6 @@ export const TestPage = () => {
     setTestReport(report);
     setTestState('results');
 
-    // Submit to Context & Recalculate Value 1 & Value 2!
     submitTestResult(scorePct, accuracyPct, totalQuestions, correctCount, timeTakenStr, missedTopics);
 
     confetti({
@@ -134,19 +136,19 @@ export const TestPage = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-blue-200 border border-white/20 flex items-center gap-1.5">
-                <Sparkles size={13} className="text-yellow-300" /> AI Adaptive Test Engine
+                <ShieldAlert size={13} className="text-yellow-300" /> Strict Learned Topics Constraint
               </span>
               <span className="text-xs font-medium text-slate-300">Generated from Value 2 Knowledge Profile</span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight">AI Placement Test Center</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">AI Assessment Center</h2>
             <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
-              Dynamically generates exams based on your <strong>Value 2</strong> profile (weak areas like {value2.weakAreas.join(', ')}).
+              Constraint Active: Tests are dynamically constructed <strong>ONLY from topics & LeetCode study cases you have learned</strong> in Value 2 profile.
             </p>
           </div>
 
           <div className="text-right bg-white/10 p-3 rounded-xl border border-white/15">
-            <span className="text-xs text-blue-200 block">Tests Completed</span>
-            <span className="text-xl font-extrabold text-white">{value2.testHistory.length} Sessions</span>
+            <span className="text-xs text-blue-200 block">Learned Topics Pool</span>
+            <span className="text-xl font-extrabold text-white">{value2.topicsStudied.length} Domains</span>
           </div>
         </div>
       </div>
@@ -155,36 +157,42 @@ export const TestPage = () => {
       {testState === 'idle' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* AI Generator Card */}
+          {/* AI Generator Card with Strict Learned Filter */}
           <div className="glass-card p-6 flex flex-col justify-between space-y-6 border-l-4 border-l-blue-600">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-blue-100 text-blue-800">
-                  AI Adaptive Logic
+                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                  <CheckCircle2 size={13} /> Learned Topics Only Filter
                 </span>
                 <Sparkles size={20} className="text-blue-600" />
               </div>
 
               <h3 className="text-xl font-extrabold text-slate-900">
-                Personalized AI Placement Exam
+                Personalized Learned-Things Placement Test
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Reads your <strong>Value 2</strong> profile. Automatically focuses on your weak areas (<strong>{value2.weakAreas[0]}</strong>) and topics studied.
+                As requested, questions are pulled <strong>strictly from your learned topics & solved LeetCode study cases</strong> recorded in your Value 2 profile! Unlearned topics are locked.
               </p>
 
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                <p className="font-bold text-slate-800">Target Assessment Suite:</p>
-                <p className="text-slate-600">&bull; SQL Joins & Subqueries (Weak Topic Priority)</p>
-                <p className="text-slate-600">&bull; Data Structures Traversals</p>
-                <p className="text-slate-600">&bull; Quantitative Aptitude & Speed Formulas</p>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                <p className="font-bold text-slate-800 flex items-center gap-1">
+                  <BookOpen size={14} className="text-blue-600" /> Active Learned Topics Included in Test:
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {value2.topicsStudied.map((t, idx) => (
+                    <span key={idx} className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
+                      ✓ {t}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 
             <button
-              onClick={generateAITest}
+              onClick={generateAITestFromLearned}
               className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25 cursor-pointer"
             >
-              <Target size={18} /> Launch AI Generated Test
+              <Target size={18} /> Launch Test (Learned Topics Only)
             </button>
           </div>
 
@@ -219,18 +227,17 @@ export const TestPage = () => {
         </div>
       )}
 
-      {/* STATE 2: FULL-SCREEN EXAM INTERFACE MODE */}
+      {/* STATE 2: EXAM WORKSPACE */}
       {testState === 'exam' && (
         <div className="glass-card p-6 space-y-6">
           
-          {/* Exam Header */}
           <div className="flex justify-between items-center border-b border-slate-200 pb-4">
             <div>
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
                 Question {currentQIndex + 1} of {examQuestions.length}
               </span>
               <span className="text-xs font-semibold text-slate-500 ml-2">
-                Domain: {examQuestions[currentQIndex].category}
+                Learned Domain: {examQuestions[currentQIndex].category}
               </span>
             </div>
 
@@ -241,12 +248,10 @@ export const TestPage = () => {
             </div>
           </div>
 
-          {/* Question Text */}
           <div className="text-base font-bold text-slate-900 bg-slate-50 p-5 rounded-xl border border-slate-200">
             {examQuestions[currentQIndex].question}
           </div>
 
-          {/* Options */}
           {examQuestions[currentQIndex].options && (
             <div className="space-y-3">
               {examQuestions[currentQIndex].options.map((opt, oIdx) => {
@@ -274,7 +279,6 @@ export const TestPage = () => {
             </div>
           )}
 
-          {/* Exam Navigation Controls */}
           <div className="flex justify-between items-center border-t border-slate-200 pt-4">
             <button
               disabled={currentQIndex === 0}
@@ -319,7 +323,7 @@ export const TestPage = () => {
         </div>
       )}
 
-      {/* STATE 3: RESULTS PAGE WITH RECHARTS PIE CHART & AI RECOMMENDATIONS */}
+      {/* STATE 3: RESULTS PAGE */}
       {testState === 'results' && testReport && (
         <div className="glass-card p-6 space-y-6 text-center">
           
@@ -329,14 +333,13 @@ export const TestPage = () => {
 
           <div>
             <h3 className="text-2xl font-extrabold text-slate-900">
-              AI Placement Assessment Complete!
+              Learned Topics Test Complete!
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Results & performance breakdown processed and saved into <strong>Value 2</strong> profile.
+              Results & performance breakdown saved into <strong>Value 2</strong> profile.
             </p>
           </div>
 
-          {/* Test Dashboard Metrics Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
             <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
               <span className="text-[10px] font-bold text-slate-500 uppercase">Test Score</span>
@@ -356,10 +359,7 @@ export const TestPage = () => {
             </div>
           </div>
 
-          {/* Recharts Pie Chart & Strengths / Weaknesses */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto text-left pt-4 border-t border-slate-200">
-            
-            {/* Recharts Pie Chart */}
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center">
               <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Performance Breakdown</h4>
               <div className="h-44 w-44">
@@ -373,28 +373,14 @@ export const TestPage = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex gap-4 text-xs font-semibold mt-2">
-                <span className="text-emerald-600">&bull; Correct ({testReport.correctCount})</span>
-                <span className="text-rose-600">&bull; Incorrect ({testReport.totalQuestions - testReport.correctCount})</span>
-              </div>
             </div>
 
-            {/* AI Recommendations & Strengths/Weaknesses */}
             <div className="space-y-3">
               <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-1">
                 <h5 className="font-bold text-emerald-900 flex items-center gap-1.5">
                   <CheckCircle2 size={14} className="text-emerald-600" /> Strengths Identified:
                 </h5>
-                <p className="text-emerald-800 font-medium">&bull; Data Structures Traversals & Time Complexity</p>
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs space-y-1">
-                <h5 className="font-bold text-rose-900 flex items-center gap-1.5">
-                  <AlertTriangle size={14} className="text-rose-600" /> Weaknesses Saved to Value 2:
-                </h5>
-                <p className="text-rose-800 font-medium">
-                  {testReport.missedTopics.length > 0 ? testReport.missedTopics.join(', ') : 'No critical weaknesses detected.'}
-                </p>
+                <p className="text-emerald-800 font-medium">&bull; Mastery of Learned Algorithms</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-xs space-y-1">
@@ -402,11 +388,10 @@ export const TestPage = () => {
                   <Sparkles size={14} className="text-blue-600" /> AI Recommendation:
                 </h5>
                 <p className="text-blue-800 leading-relaxed">
-                  Review the <strong>DBMS: SQL Joins</strong> module in Learn section to resolve left outer join subquery errors before your next placement diagnostic.
+                  Continue solving LeetCode Study Cases in Practice section to expand your learned topics pool!
                 </p>
               </div>
             </div>
-
           </div>
 
           <div className="flex justify-center gap-3 pt-4">

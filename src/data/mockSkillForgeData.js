@@ -66,8 +66,94 @@ export const INITIAL_VALUE2 = {
       confidenceScore: 85,
       date: '2026-09-25T18:30:00Z'
     }
-  ]
+  ],
+  leetCodeSolvedCases: ['lc_1', 'lc_206']
 };
+
+export const LEETCODE_STUDY_CASES = [
+  {
+    id: 'lc_1',
+    title: '1. Two Sum',
+    difficulty: 'Easy',
+    tags: ['Array', 'Hash Table'],
+    learnedTopicRef: 'Python OOP & Classes',
+    acceptance: '52.4%',
+    description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.',
+    solutionSnippet: `function twoSum(nums, target) {
+    const map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        const diff = target - nums[i];
+        if (map.has(diff)) return [map.get(diff), i];
+        map.set(nums[i], i);
+    }
+    return [];
+}`
+  },
+  {
+    id: 'lc_206',
+    title: '206. Reverse Linked List',
+    difficulty: 'Easy',
+    tags: ['Linked List', 'Recursion'],
+    learnedTopicRef: 'Binary Search Trees',
+    acceptance: '75.8%',
+    description: 'Given the head of a singly linked list, reverse the list and return the reversed list.',
+    solutionSnippet: `function reverseList(head) {
+    let prev = null, curr = head;
+    while (curr) {
+        let next = curr.next;
+        curr.next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev;
+}`
+  },
+  {
+    id: 'lc_175',
+    title: '175. Combine Two Tables (SQL)',
+    difficulty: 'Easy',
+    tags: ['Database', 'SQL Joins'],
+    learnedTopicRef: 'DBMS: SQL Basics',
+    acceptance: '76.1%',
+    description: 'Write a solution to report the first name, last name, city, and state of each person in the Person table using LEFT JOIN.',
+    solutionSnippet: `SELECT p.firstName, p.lastName, a.city, a.state
+FROM Person p
+LEFT JOIN Address a ON p.personId = a.personId;`
+  },
+  {
+    id: 'lc_98',
+    title: '98. Validate Binary Search Tree',
+    difficulty: 'Medium',
+    tags: ['Tree', 'Depth-First Search', 'BST'],
+    learnedTopicRef: 'Binary Search Trees',
+    acceptance: '32.9%',
+    description: 'Given the root of a binary tree, determine if it is a valid binary search tree (BST).',
+    solutionSnippet: `function isValidBST(root, min = null, max = null) {
+    if (!root) return true;
+    if ((min !== null && root.val <= min) || (max !== null && root.val >= max)) return false;
+    return isValidBST(root.left, min, root.val) && isValidBST(root.right, root.val, max);
+}`
+  },
+  {
+    id: 'lc_322',
+    title: '322. Coin Change (DP)',
+    difficulty: 'Medium',
+    tags: ['Dynamic Programming', 'Breadth-First Search'],
+    learnedTopicRef: 'SQL Joins & Indexing', // Weak area case
+    acceptance: '44.1%',
+    description: 'Return the fewest number of coins that you need to make up a given amount using DP state transitions.',
+    solutionSnippet: `function coinChange(coins, amount) {
+    const dp = new Array(amount + 1).fill(Infinity);
+    dp[0] = 0;
+    for (let coin of coins) {
+        for (let i = coin; i <= amount; i++) {
+            dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+        }
+    }
+    return dp[amount] === Infinity ? -1 : dp[amount];
+}`
+  }
+];
 
 export const LEARN_MODULES = [
   {
@@ -76,7 +162,7 @@ export const LEARN_MODULES = [
     title: 'SQL Joins, Indexing & Subqueries',
     duration: '45 mins',
     level: 'Medium',
-    videoUrl: 'https://www.youtube.com/embed/9yeOJ0ZMUxy', // Demonstration video container
+    videoUrl: 'https://www.youtube.com/embed/9yeOJ0ZMUxy',
     videoThumbnail: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80',
     summary: 'Master INNER, LEFT, RIGHT, and FULL OUTER joins alongside B-Tree indexing strategies used in relational database placement evaluations.',
     notes: [
@@ -93,7 +179,7 @@ WHERE e.salary > 75000;`
   {
     id: 'dsa_trees',
     category: 'Data Structures',
-    title: 'Binary Trees & BST Traversals',
+    title: 'Binary Search Trees',
     duration: '50 mins',
     level: 'Medium',
     videoUrl: 'https://www.youtube.com/embed/fAAZixBzVSc',
@@ -115,7 +201,7 @@ WHERE e.salary > 75000;`
   {
     id: 'aptitude_time_work',
     category: 'Aptitude',
-    title: 'Time, Work & Pipes Efficiency',
+    title: 'Quantitative: Time & Work',
     duration: '35 mins',
     level: 'Easy',
     videoUrl: 'https://www.youtube.com/embed/6e409xJ334',
@@ -134,7 +220,7 @@ console.log("Combined Days:", combinedDays); // 6 days`
   {
     id: 'prog_python_oop',
     category: 'Programming',
-    title: 'Python Object-Oriented Programming',
+    title: 'Python OOP & Classes',
     duration: '40 mins',
     level: 'Medium',
     videoUrl: 'https://www.youtube.com/embed/JeznW_7DlB0',
@@ -155,7 +241,7 @@ console.log("Combined Days:", combinedDays); // 6 days`
   {
     id: 'comm_prep_speaking',
     category: 'Communication Skills',
-    title: 'The PREP Framework for Placement Interviews',
+    title: 'Verbal: PREP Framework',
     duration: '30 mins',
     level: 'Easy',
     videoUrl: 'https://www.youtube.com/embed/comm12345',
@@ -164,7 +250,7 @@ console.log("Combined Days:", combinedDays); // 6 days`
     notes: [
       'Point: State your primary takeaway clearly in the first 5 seconds.',
       'Reason: Provide the logical justification or core principle.',
-      'Example: Share a concrete 30-second story or technical scenario.',
+      'Example: Share a concrete 30-second story or scenario.',
       'Point: Reiterate your main conclusion.'
     ],
     interactiveSnippet: `Sample Response:
@@ -176,7 +262,7 @@ Point: "That is why I am eager to contribute to your cloud team."`
   {
     id: 'hr_interview_prep',
     category: 'Interview Preparation',
-    title: 'Cracking HR & Behavioral Placement Rounds',
+    title: 'HR Interview: Behavioral Questions',
     duration: '45 mins',
     level: 'Advanced',
     videoUrl: 'https://www.youtube.com/embed/hr998877',

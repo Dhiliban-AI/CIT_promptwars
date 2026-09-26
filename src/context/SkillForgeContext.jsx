@@ -1,10 +1,24 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_VALUE1, INITIAL_VALUE2, LEARN_MODULES, PRACTICE_QUESTIONS, COMMUNICATION_SCENARIOS } from '../data/mockSkillForgeData';
+import { INITIAL_VALUE1, INITIAL_VALUE2, LEARN_MODULES, PRACTICE_QUESTIONS, COMMUNICATION_SCENARIOS, LEETCODE_STUDY_CASES } from '../data/mockSkillForgeData';
 
 const SkillForgeContext = createContext();
 
 export const SkillForgeProvider = ({ children }) => {
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'learn', 'practice', 'test', 'communication'
+  const [activeTab, setActiveTab] = useState('dashboard');
+
+  // Google User Auth State
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('skillforge_user');
+    return saved ? JSON.parse(saved) : {
+      isLoggedIn: true,
+      name: 'Kumaran',
+      email: 'kumaran.dee@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      batch: 'B.Tech CSE • 2026 Batch',
+      leetCodeConnected: true,
+      leetCodeHandle: 'kumaran_dev'
+    };
+  });
 
   // Persistent VALUE 1 state
   const [value1, setValue1] = useState(() => {
@@ -19,6 +33,10 @@ export const SkillForgeProvider = ({ children }) => {
   });
 
   useEffect(() => {
+    localStorage.setItem('skillforge_user', JSON.stringify(user));
+  }, [user]);
+
+  useEffect(() => {
     localStorage.setItem('skillforge_value1', JSON.stringify(value1));
   }, [value1]);
 
@@ -26,7 +44,24 @@ export const SkillForgeProvider = ({ children }) => {
     localStorage.setItem('skillforge_value2', JSON.stringify(value2));
   }, [value2]);
 
-  // Action 1: Mark Lesson as Completed
+  // Auth Functions
+  const loginWithGoogle = (account) => {
+    setUser({
+      isLoggedIn: true,
+      name: account.name,
+      email: account.email,
+      avatar: account.avatar,
+      batch: account.batch,
+      leetCodeConnected: true,
+      leetCodeHandle: account.name.toLowerCase().replace(/\s+/g, '_') + '_lc'
+    });
+  };
+
+  const logout = () => {
+    setUser(prev => ({ ...prev, isLoggedIn: false }));
+  };
+
+  // Action 1: Mark Lesson as Completed in Learn Module
   const completeLesson = (lesson) => {
     setValue1(prev => ({
       ...prev,
@@ -44,7 +79,28 @@ export const SkillForgeProvider = ({ children }) => {
     });
   };
 
-  // Action 2: Submit Practice Drill Question
+  // Action 2: Solve LeetCode Study Case (Syncs to Value 2 Learned Profile!)
+  const solveLeetCodeCase = (lcCase) => {
+    setValue1(prev => ({
+      ...prev,
+      totalPracticeQuestionsSolved: prev.totalPracticeQuestionsSolved + 1,
+      readinessPercentage: Math.min(99, prev.readinessPercentage + 1)
+    }));
+
+    setValue2(prev => {
+      const updatedSolved = Array.from(new Set([...(prev.leetCodeSolvedCases || []), lcCase.id]));
+      // Automatically add the corresponding topic to topicsStudied so it can be tested!
+      const updatedTopics = Array.from(new Set([...prev.topicsStudied, lcCase.learnedTopicRef]));
+
+      return {
+        ...prev,
+        leetCodeSolvedCases: updatedSolved,
+        topicsStudied: updatedTopics
+      };
+    });
+  };
+
+  // Action 3: Submit Practice Drill Question
   const submitPracticeAnswer = (question, isCorrect, timeTakenSec = 45) => {
     setValue1(prev => ({
       ...prev,
@@ -87,7 +143,7 @@ export const SkillForgeProvider = ({ children }) => {
     });
   };
 
-  // Action 3: Submit Dynamic Test Result
+  // Action 4: Submit Dynamic Test Result
   const submitTestResult = (scorePct, accuracyPct, totalQuestions, correctAnswers, timeSpentStr, missedTopics = []) => {
     const totalCandidates = 1450;
     const predictedRankNum = Math.max(12, Math.round(totalCandidates * (1 - scorePct / 100)));
@@ -100,7 +156,7 @@ export const SkillForgeProvider = ({ children }) => {
       accuracyPct,
       timeTaken: timeSpentStr,
       rankPrediction,
-      strengths: ['Data Structures', 'Aptitude Logic'],
+      strengths: ['Learned Topics Mastery', 'Algorithm Design'],
       weaknesses: missedTopics.length ? missedTopics : ['Advanced SQL Indexing'],
       date: new Date().toISOString()
     };
@@ -117,7 +173,7 @@ export const SkillForgeProvider = ({ children }) => {
     }));
   };
 
-  // Action 4: Submit Communication Studio Session
+  // Action 5: Submit Communication Studio Session
   const submitCommunicationSession = (type, fluency, grammar, vocabulary, confidence) => {
     const newLog = {
       id: 'cl_' + Date.now(),
@@ -135,27 +191,60 @@ export const SkillForgeProvider = ({ children }) => {
     }));
   };
 
-  // Action 5: Reset Data back to initial defaults
+  // STRICT TEST FILTER: Ensures questions in test MUST match topics studied in Value 2!
+  const getLearnedTestQuestions = () => {
+    const studied = value2.topicsStudied || [];
+    
+    // Filter practice questions where category or title matches any studied topic in Value 2
+    const filtered = PRACTICE_QUESTIONS.filter(q => {
+      return studied.some(topic => 
+        topic.toLowerCase().includes(q.category.toLowerCase()) || 
+        q.title.toLowerCase().includes(topic.toLowerCase()) ||
+        topic.toLowerCase().includes(q.title.toLowerCase())
+      );
+    });
+
+    // If filtered list is small, fallback to questions whose categories are studied
+    return filtered.length > 0 ? filtered : PRACTICE_QUESTIONS;
+  };
+
+  // Action 6: Reset Data back to initial defaults
   const resetAllProgress = () => {
+    localStorage.removeItem('skillforge_user');
     localStorage.removeItem('skillforge_value1');
     localStorage.removeItem('skillforge_value2');
     setValue1(INITIAL_VALUE1);
     setValue2(INITIAL_VALUE2);
+    setUser({
+      isLoggedIn: true,
+      name: 'Kumaran',
+      email: 'kumaran.dee@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      batch: 'B.Tech CSE • 2026 Batch',
+      leetCodeConnected: true,
+      leetCodeHandle: 'kumaran_dev'
+    });
   };
 
   return (
     <SkillForgeContext.Provider value={{
       activeTab,
       setActiveTab,
+      user,
+      loginWithGoogle,
+      logout,
       value1,
       value2,
       learnModules: LEARN_MODULES,
       practiceQuestions: PRACTICE_QUESTIONS,
+      leetCodeStudyCases: LEETCODE_STUDY_CASES,
       communicationScenarios: COMMUNICATION_SCENARIOS,
       completeLesson,
+      solveLeetCodeCase,
       submitPracticeAnswer,
       submitTestResult,
       submitCommunicationSession,
+      getLearnedTestQuestions,
       resetAllProgress
     }}>
       {children}
